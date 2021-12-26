@@ -96,7 +96,7 @@ const Home: NextPage = () => {
     average_reward: number,
     work_hours: number
   ) => {
-    return average_reward / work_hours
+    return average_reward / work_hours;
   };
 
   const formatNumber = (number: number | string) => {
@@ -112,19 +112,29 @@ const Home: NextPage = () => {
 
   return (
     <div className="container mx-auto">
-      <div className="text-2xl text-center my-8">Boss Space</div>
+      <div className="text-center my-8">
+        <div className="text-2xl">Boss Space</div>
+        <div className="text-center">
+          by{" "}
+          <a
+            className="text-blue-500 hover:text-blue-300 hover:underline"
+            target="_blank"
+            rel="noreferrer"
+            href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+          >
+            bananaminion
+          </a>
+        </div>
+      </div>
 
       {/* Header */}
-      <div className="grid grid-cols-7">
-        <div></div>
+      <div className="grid grid-cols-6">
         {Object.entries(RARITY_INFO).map(([rarity_name, rank]) => {
           return (
             <div key={`header-${rarity_name}`}>
-              <div className="uppercase">{rarity_name}</div>
-              <div>
-                Lowest price: {formatNumber(lowestPriceMapping[rarity_name])}{" "}
-                WAX
-              </div>
+              <div className={`uppercase ${rank.color}`}>{rarity_name}</div>
+              <div className="text-sm mt-2">Lowest price</div>
+              <div>{formatNumber(lowestPriceMapping[rarity_name])} WAX</div>
             </div>
           );
         })}
@@ -133,8 +143,8 @@ const Home: NextPage = () => {
       {/* Tasks */}
       {taskList.map((task) => {
         return (
-          <div className="grid grid-cols-7 my-4" key={`task-${task.task_id}`}>
-            <div>{task.task_name}</div>
+          <div className="grid grid-cols-6 my-4" key={`task-${task.task_id}`}>
+            <div className="col-span-6 my-4 font-bold">{task.task_name}</div>
             {Object.entries(RARITY_INFO).map(([rarity, rank]) => {
               return (
                 <div className="w-96" key={`${task.task_id}-rarity-${rarity}`}>
@@ -160,7 +170,10 @@ const Home: NextPage = () => {
                             coffeeCost
                           );
 
-                          const averageRewardPerHour = getAverageRewardPerHour(averageReward, workTime)
+                          const averageRewardPerHour = getAverageRewardPerHour(
+                            averageReward,
+                            workTime
+                          );
                           return (
                             <div
                               className="flex text-sm"
@@ -171,14 +184,17 @@ const Home: NextPage = () => {
                               </div>
                               <div>
                                 <div>
-                                  {formatNumber(averageReward)} in {formatNumber(workTime)}h (
-                                  {formatNumber(averageRewardPerHour)}/hr)
+                                  {formatNumber(averageRewardPerHour)}/hr
+                                </div>
+                                <div className="text-[11px] text-gray-300">
+                                  {formatNumber(averageReward)} OCOIN in{" "}
+                                  {formatNumber(workTime)}h<div></div>
                                 </div>
                                 <div>
                                   <span className="uppercase text-gray-400 text-xs">
                                     PB{" "}
                                   </span>
-                                  <span className="font-mono">
+                                  <span>
                                     {formatNumber(
                                       getPaybackPeriod(
                                         averageRewardPerHour,

@@ -11,7 +11,15 @@ const getOfficeLandData = async (
   });
 };
 
-export const RARITY_INFO = {
+export const RARITY_INFO: Record<
+  string,
+  {
+    color: string;
+    man_hours: number;
+    reduce_time: number;
+    success_rate: number;
+  }
+> = {
   intern: {
     color: "text-gray-400",
     man_hours: 1,
