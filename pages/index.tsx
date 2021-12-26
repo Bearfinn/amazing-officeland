@@ -8,6 +8,7 @@ import {
   RARITY_INFO,
   TaskList,
 } from "../utils/officeland";
+import { getOcoinPrice } from "../utils/wax";
 
 type CoffeeExtended = Coffee & {
   average_reduce_time: number;
@@ -20,6 +21,7 @@ const Home: NextPage = () => {
   const [lowestPriceMapping, setLowestPriceMapping] = useState<
     Record<string, number>
   >({});
+  const [ocoinPrice, setOcoinPrice] = useState(0);
 
   useEffect(() => {
     getTaskList().then((taskList) => setTaskList(taskList));
@@ -42,6 +44,8 @@ const Home: NextPage = () => {
         }))
       )
     );
+
+    getOcoinPrice().then((lastPrice) => setOcoinPrice(lastPrice));
 
     Object.keys(RARITY_INFO).forEach((rarity) => {
       getLowestPriceOfRarity(rarity).then((marketItem) => {
@@ -84,6 +88,11 @@ const Home: NextPage = () => {
     }).format(Number(number));
   };
 
+  const getPaybackPeriod = (ocoinPerHour: number, investPrice: number) => {
+    const investPriceInOcoin = investPrice / ocoinPrice
+    return investPriceInOcoin / (ocoinPerHour * 24);
+  };
+
   return (
     <div className="overflow-x-scroll">
       {taskList.map((task) => {
@@ -124,7 +133,7 @@ const Home: NextPage = () => {
                             (task.task_time - coffee.average_reduce_time / 60);
                           return (
                             <div
-                              className="grid grid-cols-7"
+                              className="grid flex"
                               key={`coffee-${coffee.item_id}`}
                             >
                               <div>{coffee.item_name.slice(0, 3)}</div>
@@ -148,7 +157,12 @@ const Home: NextPage = () => {
                                 <span className="uppercase text-gray-400 text-xs">
                                   PB{" "}
                                 </span>
-                                <span className="font-mono">Day</span>
+                                <span className="font-mono">
+                                  {formatNumber(getPaybackPeriod(
+                                    rewardAveragePerHour,
+                                    lowestPriceMapping[rarity]
+                                  ))} Days
+                                </span>
                               </div>
                             </div>
                           );

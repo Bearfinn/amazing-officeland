@@ -51,3 +51,29 @@ export const sleepRandomly = async () => {
     setTimeout(resolve, sleepTime);
   });
 };
+
+export const getOraclePrice = async () => {
+  const response = await rpc.get_table_rows({
+    json: true,
+    code: "delphioracle",
+    scope: "waxpusd",
+    table: "datapoints",
+    lower_bound: "",
+    upper_bound: "",
+    index_position: 3,
+    key_type: "i64",
+    limit: 1,
+    reverse: true,
+    show_payer: false,
+  });
+
+  const { median, value } = response.rows[0];
+  
+  return { median, value }
+}
+
+export const getOcoinPrice = async () => {
+  const response = await fetch("https://wax.alcor.exchange/api/markets/258")
+  const data: any = await response.json()
+  return data.last_price
+}
