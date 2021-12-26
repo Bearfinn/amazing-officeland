@@ -39,6 +39,7 @@ export const RARITY_INFO = {
 };
 
 export interface TaskList {
+  task_id: number;
   task_name: string;
   task_time: number;
   task_diff: number;
