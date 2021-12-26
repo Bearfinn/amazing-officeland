@@ -31,7 +31,7 @@ const Home: NextPage = () => {
           {
             success_rate: [0, 0],
             reduce_time: [0, 0],
-            item_name: "-",
+            item_name: "No",
             item_amount: "0.0000 OCOIN",
           },
           ...coffees,
@@ -64,22 +64,39 @@ const Home: NextPage = () => {
     });
   }, []);
 
-  const getRewardPerHour = (man_hours: number, difficulty: number) => {
-    return man_hours - difficulty;
+  const getReward = (
+    man_hours: number,
+    difficulty: number,
+    task_hours: number
+  ) => {
+    return task_hours * (man_hours - difficulty);
   };
 
-  const getAverageRewardPerHour = (
+  const getRewardPerHour = (total_reward: number, work_hours: number) => {
+    return total_reward / work_hours;
+  };
+
+  const getAverageReward = (
     man_hours: number,
     difficulty: number,
     success_rate_percent: number,
+    task_hours: number,
     item_cost?: number
   ) => {
-    const reward = getRewardPerHour(man_hours, difficulty);
+    const reward = getReward(man_hours, difficulty, task_hours);
+    if (success_rate_percent >= 100) success_rate_percent = 100;
     return (
       (success_rate_percent / 100) * reward +
       (1 - success_rate_percent / 100) * 0.2 * reward -
       (item_cost || 0)
     );
+  };
+
+  const getAverageRewardPerHour = (
+    average_reward: number,
+    work_hours: number
+  ) => {
+    return average_reward / work_hours
   };
 
   const formatNumber = (number: number | string) => {
@@ -89,81 +106,90 @@ const Home: NextPage = () => {
   };
 
   const getPaybackPeriod = (ocoinPerHour: number, investPrice: number) => {
-    const investPriceInOcoin = investPrice / ocoinPrice
+    const investPriceInOcoin = investPrice / ocoinPrice;
     return investPriceInOcoin / (ocoinPerHour * 24);
   };
 
   return (
-    <div className="overflow-x-scroll">
+    <div className="container mx-auto">
+      <div className="text-2xl text-center my-8">Boss Space</div>
+
+      {/* Header */}
+      <div className="grid grid-cols-7">
+        <div></div>
+        {Object.entries(RARITY_INFO).map(([rarity_name, rank]) => {
+          return (
+            <div key={`header-${rarity_name}`}>
+              <div className="uppercase">{rarity_name}</div>
+              <div>
+                Lowest price: {formatNumber(lowestPriceMapping[rarity_name])}{" "}
+                WAX
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Tasks */}
       {taskList.map((task) => {
         return (
-          <div className="flex" key={`task-${task.task_id}`}>
+          <div className="grid grid-cols-7 my-4" key={`task-${task.task_id}`}>
             <div>{task.task_name}</div>
             {Object.entries(RARITY_INFO).map(([rarity, rank]) => {
-              const reward = getRewardPerHour(rank.man_hours, task.task_diff);
-              const rewardAverage = getAverageRewardPerHour(
-                rank.man_hours,
-                task.task_diff,
-                rank.success_rate
-              );
               return (
                 <div className="w-96" key={`${task.task_id}-rarity-${rarity}`}>
                   {task.ranks.includes(rarity) && (
                     <>
-                      <div className="uppercase">{rarity}</div>
-                      {lowestPriceMapping[rarity]}
-                      Base:
-                      <div>
-                        {formatNumber(reward * task.task_time)} OCOIN in{" "}
-                        {task.task_time} hr ({formatNumber(reward)} OCOIN/hr)
-                      </div>
                       <div>
                         {coffees.map((coffee) => {
                           const coffeeCost = Number(
                             coffee.item_amount.split(" ")[0]
                           );
-                          const rewardAveragePerHour = getAverageRewardPerHour(
+                          const workTime =
+                            ((100 -
+                              rank.reduce_time -
+                              coffee.average_reduce_time) /
+                              100) *
+                            task.task_time;
+
+                          const averageReward = getAverageReward(
                             rank.man_hours,
                             task.task_diff,
-                            rank.success_rate - coffee.average_success_rate,
+                            rank.success_rate + coffee.average_success_rate,
+                            task.task_time,
                             coffeeCost
                           );
-                          const rewardAverage =
-                            rewardAveragePerHour *
-                            (task.task_time - coffee.average_reduce_time / 60);
+
+                          const averageRewardPerHour = getAverageRewardPerHour(averageReward, workTime)
                           return (
                             <div
-                              className="grid flex"
+                              className="flex text-sm"
                               key={`coffee-${coffee.item_id}`}
                             >
-                              <div>{coffee.item_name.slice(0, 3)}</div>
-                              <div className="col-span-2">
-                                <span className="uppercase text-gray-400 text-xs">
-                                  Avg{" "}
-                                </span>
-                                <span className="font-mono">
-                                  {formatNumber(rewardAverage)}
-                                </span>
+                              <div className="w-9">
+                                {coffee.item_name.slice(0, 3)}
                               </div>
-                              <div className="col-span-2">
-                                <span className="uppercase text-gray-400 text-xs">
-                                  Avg/hr{" "}
-                                </span>
-                                <span className="font-mono">
-                                  {formatNumber(rewardAveragePerHour)}
-                                </span>
+                              <div>
+                                <div>
+                                  {formatNumber(averageReward)} in {formatNumber(workTime)}h (
+                                  {formatNumber(averageRewardPerHour)}/hr)
+                                </div>
+                                <div>
+                                  <span className="uppercase text-gray-400 text-xs">
+                                    PB{" "}
+                                  </span>
+                                  <span className="font-mono">
+                                    {formatNumber(
+                                      getPaybackPeriod(
+                                        averageRewardPerHour,
+                                        lowestPriceMapping[rarity]
+                                      )
+                                    )}{" "}
+                                    Days
+                                  </span>
+                                </div>
                               </div>
-                              <div className="col-span-2">
-                                <span className="uppercase text-gray-400 text-xs">
-                                  PB{" "}
-                                </span>
-                                <span className="font-mono">
-                                  {formatNumber(getPaybackPeriod(
-                                    rewardAveragePerHour,
-                                    lowestPriceMapping[rarity]
-                                  ))} Days
-                                </span>
-                              </div>
+                              <div className="col-span-2"></div>
                             </div>
                           );
                         })}
