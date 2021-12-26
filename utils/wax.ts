@@ -2,8 +2,7 @@ import { JsonRpc } from "eosjs";
 
 export const account = process.env.ACCOUNT as string;
 
-export const rpc = new JsonRpc("http://wax.pink.gg");
-
+export const rpc = new JsonRpc(process.env.NEXT_PUBLIC_RPC_URL || "https://wax.pink.gg");
 export interface GetTableRowParams {
   json?: boolean;
   code?: string;
