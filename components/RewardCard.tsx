@@ -11,6 +11,9 @@ const RewardCard: FunctionComponent<RewardCardProps> = ({
   const bestReward = rewardCalculations[0];
   return (
     <div className="relative group">
+      <div className="text-xs bg-yellow-100 text-yellow-600 px-2 py-1 rounded inline">
+        Best coffee
+      </div>
       <div>
         {bestReward && <RewardCardInfo rewardCalculation={bestReward} />}
       </div>

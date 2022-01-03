@@ -34,7 +34,10 @@ const RewardCardInfo: FunctionComponent<RewardCardInfoProps> = ({
 
         <div className="">
           <div>
-            <div className="text-lg">{formatNumber(averageRewardPerHour)}/hr</div>
+            <div className="text-lg">
+              {formatNumber(averageRewardPerHour * 24)}
+              <span className="text-sm ml-1">OCOIN/D</span>
+            </div>
             <div className="text-[11px] text-gray-300">
               {formatNumber(averageReward)} OCOIN in {formatNumber(workTime)}h
               <div></div>
