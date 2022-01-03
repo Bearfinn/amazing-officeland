@@ -11,14 +11,14 @@ const RewardCard: FunctionComponent<RewardCardProps> = ({
   const bestReward = rewardCalculations[0];
   return (
     <div className="relative group">
-      <div className="text-xs bg-yellow-100 text-yellow-600 px-2 py-1 rounded inline">
+      <div className="text-xs bg-yellow-800 text-yellow-500 px-2 py-1 rounded inline">
         Best coffee
       </div>
       <div>
         {bestReward && <RewardCardInfo rewardCalculation={bestReward} />}
       </div>
       {/* Tooltip */}
-      <div className="absolute bg-white shadow-md hidden group-hover:block top-4 left-4 z-10 flex flex-col gap-4 p-4">
+      <div className="absolute bg-gray-900 shadow-md hidden group-hover:block top-full left-4 z-10 flex flex-col gap-4 p-4">
         {rewardCalculations.map((rewardCalculation, index) => {
           return (
             rewardCalculation && (
