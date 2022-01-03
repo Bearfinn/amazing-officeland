@@ -1,19 +1,11 @@
 import type { NextPage } from "next";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import RewardCard from "../components/RewardCard";
+import { CoffeeExtended, RewardCalculation, TaskList } from "../types";
 import { getLowestPriceOfRarity } from "../utils/atomic";
-import {
-  Coffee,
-  getCoffees,
-  getTaskList,
-  RARITY_INFO,
-  TaskList,
-} from "../utils/officeland";
+import { formatNumber } from "../utils/format";
+import { getCoffees, getTaskList, RARITY_INFO } from "../utils/officeland";
 import { getOcoinPrice } from "../utils/wax";
-
-type CoffeeExtended = Coffee & {
-  average_reduce_time: number;
-  average_success_rate: number;
-};
 
 const Home: NextPage = () => {
   const [taskList, setTaskList] = useState<TaskList[]>([]);
@@ -76,22 +68,6 @@ const Home: NextPage = () => {
     return total_reward / work_hours;
   };
 
-  const getAverageReward = (
-    man_hours: number,
-    difficulty: number,
-    success_rate_percent: number,
-    task_hours: number,
-    item_cost?: number
-  ) => {
-    const reward = getReward(man_hours, difficulty, task_hours);
-    if (success_rate_percent >= 100) success_rate_percent = 100;
-    return (
-      (success_rate_percent / 100) * reward +
-      (1 - success_rate_percent / 100) * 0.2 * reward -
-      (item_cost || 0)
-    );
-  };
-
   const getAverageRewardPerHour = (
     average_reward: number,
     work_hours: number
@@ -99,16 +75,89 @@ const Home: NextPage = () => {
     return average_reward / work_hours;
   };
 
-  const formatNumber = (number: number | string) => {
-    return new Intl.NumberFormat("en-US", {
-      maximumFractionDigits: 2,
-    }).format(Number(number));
-  };
+  const calculateReward = useCallback(
+    (
+      task: Record<string, any>,
+      rarity: string,
+      rank: Record<string, any>,
+      coffee: CoffeeExtended
+    ) => {
+      const getPaybackPeriod = (ocoinPerHour: number, investPrice: number) => {
+        const investPriceInOcoin = investPrice / ocoinPrice;
+        return investPriceInOcoin / (ocoinPerHour * 24);
+      };
 
-  const getPaybackPeriod = (ocoinPerHour: number, investPrice: number) => {
-    const investPriceInOcoin = investPrice / ocoinPrice;
-    return investPriceInOcoin / (ocoinPerHour * 24);
-  };
+      const getAverageReward = (
+        man_hours: number,
+        difficulty: number,
+        success_rate_percent: number,
+        task_hours: number,
+        item_cost?: number
+      ) => {
+        const reward = getReward(man_hours, difficulty, task_hours);
+        if (success_rate_percent >= 100) success_rate_percent = 100;
+        return (
+          (success_rate_percent / 100) * reward +
+          (1 - success_rate_percent / 100) * 0.2 * reward -
+          (item_cost || 0)
+        );
+      };
+
+      const coffeeCost = Number(coffee.item_amount.split(" ")[0]);
+
+      const workTime =
+        ((100 - rank.reduce_time - coffee.average_reduce_time) / 100) *
+        task.task_time;
+
+      const averageReward = getAverageReward(
+        rank.man_hours,
+        task.task_diff,
+        rank.success_rate + coffee.average_success_rate,
+        task.task_time,
+        coffeeCost
+      );
+
+      const averageRewardPerHour = getAverageRewardPerHour(
+        averageReward,
+        workTime
+      );
+
+      const paybackPeriod = getPaybackPeriod(
+        averageRewardPerHour,
+        lowestPriceMapping[rarity]
+      );
+      return {
+        averageRewardPerHour,
+        averageReward,
+        workTime,
+        paybackPeriod,
+      };
+    },
+    [lowestPriceMapping, ocoinPrice]
+  );
+
+  const rewardCalculations = useMemo(() => {
+    const result: RewardCalculation[] = [];
+    taskList.forEach((task) => {
+      Object.entries(RARITY_INFO).forEach(([rarity, rank]) => {
+        coffees.forEach((coffee) => {
+          const rewardInfo = calculateReward(task, rarity, rank, coffee);
+          result.push({
+            task,
+            rarity,
+            rank,
+            coffee,
+            rewardInfo,
+          });
+        });
+      });
+    });
+    result.sort(
+      (a, b) =>
+        b.rewardInfo.averageRewardPerHour - a.rewardInfo.averageRewardPerHour
+    );
+    return result;
+  }, [calculateReward, coffees, taskList]);
 
   return (
     <div className="container mx-auto">
@@ -146,69 +195,28 @@ const Home: NextPage = () => {
           <div className="grid grid-cols-6 my-4" key={`task-${task.task_id}`}>
             <div className="col-span-6 my-4 font-bold">{task.task_name}</div>
             {Object.entries(RARITY_INFO).map(([rarity, rank]) => {
+              const sortedRewards = rewardCalculations.filter(
+                (rewardCalculation) =>
+                  rewardCalculation.rarity === rarity &&
+                  rewardCalculation.task.task_id === task.task_id
+              );
               return (
                 <div className="w-96" key={`${task.task_id}-rarity-${rarity}`}>
                   {task.ranks.includes(rarity) && (
                     <>
                       <div>
-                        {coffees.map((coffee) => {
-                          const coffeeCost = Number(
-                            coffee.item_amount.split(" ")[0]
-                          );
-                          const workTime =
-                            ((100 -
-                              rank.reduce_time -
-                              coffee.average_reduce_time) /
-                              100) *
-                            task.task_time;
-
-                          const averageReward = getAverageReward(
-                            rank.man_hours,
-                            task.task_diff,
-                            rank.success_rate + coffee.average_success_rate,
-                            task.task_time,
-                            coffeeCost
-                          );
-
-                          const averageRewardPerHour = getAverageRewardPerHour(
-                            averageReward,
-                            workTime
-                          );
-                          return (
-                            <div
-                              className="flex text-sm"
-                              key={`coffee-${coffee.item_id}`}
-                            >
-                              <div className="w-9">
-                                {coffee.item_name.slice(0, 3)}
+                        {sortedRewards.map(
+                          (rewardCalculation) => {
+                            return (
+                              <div
+                                className="flex text-sm"
+                                key={`coffee-${rewardCalculation.coffee.item_id}`}
+                              >
+                               <RewardCard rewardCalculation={rewardCalculation} />
                               </div>
-                              <div>
-                                <div>
-                                  {formatNumber(averageRewardPerHour)}/hr
-                                </div>
-                                <div className="text-[11px] text-gray-300">
-                                  {formatNumber(averageReward)} OCOIN in{" "}
-                                  {formatNumber(workTime)}h<div></div>
-                                </div>
-                                <div>
-                                  <span className="uppercase text-gray-400 text-xs">
-                                    PB{" "}
-                                  </span>
-                                  <span>
-                                    {formatNumber(
-                                      getPaybackPeriod(
-                                        averageRewardPerHour,
-                                        lowestPriceMapping[rarity]
-                                      )
-                                    )}{" "}
-                                    Days
-                                  </span>
-                                </div>
-                              </div>
-                              <div className="col-span-2"></div>
-                            </div>
-                          );
-                        })}
+                            );
+                          }
+                        )}
                       </div>
                     </>
                   )}

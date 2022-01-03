@@ -1,3 +1,4 @@
+import { TaskList } from "../types";
 import { getData, GetTableRowOptions } from "./wax";
 
 const getOfficeLandData = async (
@@ -58,29 +59,11 @@ export const RARITY_INFO: Record<
   },
 };
 
-export interface TaskList {
-  task_id: number;
-  task_name: string;
-  task_time: number;
-  task_diff: number;
-  ranks: string[];
-}
+
 
 export const getTaskList = async (): Promise<TaskList[]> => {
   return getOfficeLandData("tasklist");
 };
-
-export interface Coffee {
-  item_id: number;
-  item_name: string;
-  item_data: string;
-  success_rate: [number, number];
-  reduce_time: [number, number];
-  item_amount: string;
-  item_type: number;
-  item_status: number;
-  item_task: string[];
-}
 
 export const getCoffees = async () => {
   return getOfficeLandData("items");
