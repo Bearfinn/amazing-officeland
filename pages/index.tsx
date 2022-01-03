@@ -23,7 +23,7 @@ const Home: NextPage = () => {
           {
             success_rate: [0, 0],
             reduce_time: [0, 0],
-            item_name: "No",
+            item_name: "(No coffee)",
             item_amount: "0.0000 OCOIN",
           },
           ...coffees,
@@ -204,20 +204,7 @@ const Home: NextPage = () => {
                 <div className="w-96" key={`${task.task_id}-rarity-${rarity}`}>
                   {task.ranks.includes(rarity) && (
                     <>
-                      <div>
-                        {sortedRewards.map(
-                          (rewardCalculation) => {
-                            return (
-                              <div
-                                className="flex text-sm"
-                                key={`coffee-${rewardCalculation.coffee.item_id}`}
-                              >
-                               <RewardCard rewardCalculation={rewardCalculation} />
-                              </div>
-                            );
-                          }
-                        )}
-                      </div>
+                      <RewardCard rewardCalculations={sortedRewards} />
                     </>
                   )}
                 </div>

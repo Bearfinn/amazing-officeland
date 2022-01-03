@@ -1,33 +1,32 @@
 import { FunctionComponent } from "react";
 import { RewardCalculation } from "../types";
-import { formatNumber } from "../utils/format";
-
+import RewardCardInfo from "./RewardCardInfo";
 interface RewardCardProps {
-  rewardCalculation: RewardCalculation;
+  rewardCalculations: RewardCalculation[];
 }
 
 const RewardCard: FunctionComponent<RewardCardProps> = ({
-  rewardCalculation,
+  rewardCalculations,
 }) => {
-  const { coffee, rewardInfo } = rewardCalculation;
-  const { averageReward, averageRewardPerHour, workTime, paybackPeriod } =
-    rewardInfo;
-  rewardCalculation;
+  const bestReward = rewardCalculations[0];
   return (
-    <div className="flex text-sm" key={`coffee-${coffee.item_id}`}>
-      <div className="w-9">{coffee.item_name.slice(0, 3)}</div>
+    <div className="relative group">
       <div>
-        <div>{formatNumber(averageRewardPerHour)}/hr</div>
-        <div className="text-[11px] text-gray-300">
-          {formatNumber(averageReward)} OCOIN in {formatNumber(workTime)}h
-          <div></div>
-        </div>
-        <div>
-          <span className="uppercase text-gray-400 text-xs">PB </span>
-          <span>{formatNumber(paybackPeriod)} Days</span>
-        </div>
+        {bestReward && <RewardCardInfo rewardCalculation={bestReward} />}
       </div>
-      <div className="col-span-2"></div>
+      {/* Tooltip */}
+      <div className="absolute bg-white shadow-md hidden group-hover:block top-4 left-4 z-10 flex flex-col gap-4 p-4">
+        {rewardCalculations.map((rewardCalculation, index) => {
+          return (
+            rewardCalculation && (
+              <RewardCardInfo
+                key={index}
+                rewardCalculation={rewardCalculation}
+              />
+            )
+          );
+        })}
+      </div>
     </div>
   );
 };
