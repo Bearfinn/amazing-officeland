@@ -1,11 +1,12 @@
 import type { NextPage } from "next";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import RewardCard from "../components/RewardCard";
 import { CoffeeExtended, RewardCalculation, TaskList } from "../types";
 import { getLowestPriceOfRarity } from "../utils/atomic";
 import { formatNumber } from "../utils/format";
 import { getCoffees, getTaskList, RARITY_INFO } from "../utils/officeland";
 import { getOcoinPrice } from "../utils/wax";
+import { AppContext } from "./_app";
 
 const Home: NextPage = () => {
   const [taskList, setTaskList] = useState<TaskList[]>([]);
@@ -14,6 +15,7 @@ const Home: NextPage = () => {
     Record<string, number>
   >({});
   const [ocoinPrice, setOcoinPrice] = useState(0);
+  const { tax } = useContext(AppContext);
 
   useEffect(() => {
     getTaskList().then((taskList) => setTaskList(taskList));
@@ -56,13 +58,12 @@ const Home: NextPage = () => {
     });
   }, []);
 
-  const getReward = (
-    man_hours: number,
-    difficulty: number,
-    task_hours: number
-  ) => {
-    return task_hours * (man_hours - difficulty);
-  };
+  const getReward = useCallback(
+    (man_hours: number, difficulty: number, task_hours: number) => {
+      return (task_hours * (man_hours - difficulty)) * (1 - ( tax / 100 ));
+    },
+    [tax]
+  );
 
   const getRewardPerHour = (total_reward: number, work_hours: number) => {
     return total_reward / work_hours;
@@ -133,7 +134,7 @@ const Home: NextPage = () => {
         paybackPeriod,
       };
     },
-    [lowestPriceMapping, ocoinPrice]
+    [getReward, lowestPriceMapping, ocoinPrice]
   );
 
   const rewardCalculations = useMemo(() => {
@@ -173,6 +174,9 @@ const Home: NextPage = () => {
           >
             bananaminion
           </a>
+        </div>
+        <div className="mt-2">
+          Tax: {tax}%
         </div>
       </div>
 

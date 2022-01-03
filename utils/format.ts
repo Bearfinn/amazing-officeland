@@ -1,7 +1,7 @@
 export const formatNumber = (number: number | string) => {
-  return new Intl.NumberFormat("en-US", {
+  return number ? new Intl.NumberFormat("en-US", {
     maximumFractionDigits: 2,
-  }).format(Number(number));
+  }).format(Number(number)) : "0";
 };
 
 export const getCoffeeImageUrl = (name: string) => {
