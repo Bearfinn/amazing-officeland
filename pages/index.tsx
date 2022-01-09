@@ -1,4 +1,5 @@
 import type { NextPage } from "next";
+import Head from "next/head";
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import RewardCard from "../components/RewardCard";
 import { CoffeeExtended, RewardCalculation, TaskList } from "../types";
@@ -162,8 +163,11 @@ const Home: NextPage = () => {
 
   return (
     <div className="container mx-auto px-4">
+      <Head>
+        <title>Officeland Boss Room</title>
+      </Head>
       <div className="text-center my-8">
-        <div className="text-2xl">Boss Space</div>
+        <div className="text-2xl">Officeland Boss Room</div>
         <div className="text-center">
           by{" "}
           <a
@@ -175,14 +179,21 @@ const Home: NextPage = () => {
             bananaminion
           </a>
         </div>
-        <div className="mt-2">Tax: {tax}%</div>
+        <div className="mt-2 border rounded-lg px-4 py-2">
+          <div>OCOIN Price: {ocoinPrice} WAX</div>
+          <div>Include withdraw fee duration: No</div>
+          <div>Tax: {tax}% (withdraw at least 1,000 at one time)</div>
+        </div>
       </div>
 
       {/* Header */}
       <div className="grid grid-cols-6">
         {Object.entries(RARITY_INFO).map(([rarity_name, rank]) => {
           return (
-            <div className="col-span-2 lg:col-span-1" key={`header-${rarity_name}`}>
+            <div
+              className="col-span-2 lg:col-span-1"
+              key={`header-${rarity_name}`}
+            >
               <div className={`uppercase ${rank.color}`}>{rarity_name}</div>
               <div className="text-sm mt-2">Lowest price</div>
               <div>{formatNumber(lowestPriceMapping[rarity_name])} WAX</div>
@@ -194,7 +205,10 @@ const Home: NextPage = () => {
       {/* Tasks */}
       {taskList.map((task) => {
         return (
-          <div className="grid grid-cols-6 gap-4 my-4" key={`task-${task.task_id}`}>
+          <div
+            className="grid grid-cols-6 gap-4 my-4"
+            key={`task-${task.task_id}`}
+          >
             <div className="col-span-6 my-4 font-bold">{task.task_name}</div>
             {Object.entries(RARITY_INFO).map(([rarity, rank]) => {
               const sortedRewards = rewardCalculations.filter(
@@ -203,10 +217,16 @@ const Home: NextPage = () => {
                   rewardCalculation.task.task_id === task.task_id
               );
               return (
-                <div className="col-span-2 lg:col-span-1" key={`${task.task_id}-rarity-${rarity}`}>
+                <div
+                  className="col-span-2 lg:col-span-1"
+                  key={`${task.task_id}-rarity-${rarity}`}
+                >
                   {task.ranks.includes(rarity) && (
                     <div className="">
-                      <RewardCard rarity={rarity} rewardCalculations={sortedRewards} />
+                      <RewardCard
+                        rarity={rarity}
+                        rewardCalculations={sortedRewards}
+                      />
                     </div>
                   )}
                 </div>
