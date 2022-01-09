@@ -1,20 +1,25 @@
 import { FunctionComponent } from "react";
 import { RewardCalculation } from "../types";
+import { RARITY_INFO } from "../utils/officeland";
 import RewardCardInfo from "./RewardCardInfo";
 interface RewardCardProps {
+  rarity: string;
   rewardCalculations: RewardCalculation[];
 }
 
 const RewardCard: FunctionComponent<RewardCardProps> = ({
+  rarity,
   rewardCalculations,
 }) => {
   const bestReward = rewardCalculations[0];
   return (
-    <div className="relative group">
-      <div className="text-xs bg-yellow-800 text-yellow-500 px-2 py-1 rounded inline">
-        Best coffee
+    <div className="relative group shadow-lg mt-8 rounded-lg bg-gray-800">
+      <div
+        className={`uppercase px-4 py-2 rounded-t-lg text-gray-900 font-bold ${RARITY_INFO[rarity].bg_color}`}
+      >
+        {rarity}
       </div>
-      <div>
+      <div className="p-2">
         {bestReward && <RewardCardInfo rewardCalculation={bestReward} />}
       </div>
       {/* Tooltip */}

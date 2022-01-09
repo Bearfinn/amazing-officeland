@@ -17,7 +17,7 @@ const RewardCardInfo: FunctionComponent<RewardCardInfoProps> = ({
   return (
     <div className="flex text-sm" key={`coffee-${coffee.item_id}`}>
       <div className="relative p-2">
-        <div className="flex items-center gap-1 text-bold">
+        <div className="flex items-center text-bold">
           <div className="">
             {coffee.item_name !== "(No coffee)" && (
               // eslint-disable-next-line @next/next/no-img-element
@@ -29,21 +29,21 @@ const RewardCardInfo: FunctionComponent<RewardCardInfoProps> = ({
               ></img>
             )}
           </div>
-          <div className="mb-2">{coffee.item_name}</div>
+          <div className="">{coffee.item_name}</div>
         </div>
 
         <div className="">
           <div>
-            <div className="text-lg text-yellow-300">
+            <div className="text-xl text-yellow-300 mt-4">
               {formatNumber(averageRewardPerHour * 24)}
               <span className="text-sm ml-1">OCOIN/D</span>
             </div>
-            <div className="text-[11px] text-gray-300">
+            <div className="text-[12px] text-gray-300">
               {formatNumber(averageReward)} OCOIN in {formatNumber(workTime)}h
               <div></div>
             </div>
-            <div className="mt-2">
-              <span className="uppercase text-gray-400 text-xs">PB </span>
+            <div className="mt-4">
+              <span className="text-gray-400 text-xs">PB </span>
               <span>{formatNumber(paybackPeriod)} Days</span>
             </div>
           </div>
