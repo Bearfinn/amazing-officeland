@@ -18,6 +18,8 @@ const Home: NextPage = () => {
   const [ocoinPrice, setOcoinPrice] = useState(0);
   const { tax } = useContext(AppContext);
 
+  const [includeFeeDuration, setIncludeFeeDuration] = useState(true);
+
   useEffect(() => {
     getTaskList().then((taskList) => setTaskList(taskList));
     getCoffees().then((coffees) =>
@@ -86,7 +88,11 @@ const Home: NextPage = () => {
     ) => {
       const getPaybackPeriod = (ocoinPerHour: number, investPrice: number) => {
         const investPriceInOcoin = investPrice / ocoinPrice;
-        return investPriceInOcoin / (ocoinPerHour * 24);
+        let paybackPeriod = investPriceInOcoin / (ocoinPerHour * 24);
+        if (includeFeeDuration) {
+          paybackPeriod += 5; // days
+        }
+        return paybackPeriod;
       };
 
       const getAverageReward = (
@@ -135,7 +141,7 @@ const Home: NextPage = () => {
         paybackPeriod,
       };
     },
-    [getReward, lowestPriceMapping, ocoinPrice]
+    [getReward, includeFeeDuration, lowestPriceMapping, ocoinPrice]
   );
 
   const rewardCalculations = useMemo(() => {
@@ -181,7 +187,14 @@ const Home: NextPage = () => {
         </div>
         <div className="mt-2 border rounded-lg px-4 py-2">
           <div>OCOIN Price: {ocoinPrice} WAX</div>
-          <div>Include withdraw fee duration: No</div>
+          <div>
+            <input
+              type="checkbox"
+              checked={includeFeeDuration}
+              onChange={(e) => setIncludeFeeDuration(e.target.checked)}
+            ></input>
+            Include withdraw fee duration: No
+          </div>
           <div>Tax: {tax}% (withdraw at least 1,000 at one time)</div>
         </div>
       </div>
