@@ -14,7 +14,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   getOcoinPrice().then((lastPrice) => setOcoinPrice(lastPrice));
 
   return (
-    <AppContext.Provider value={{ tax: 2., ocoinPrice }}>
+    <AppContext.Provider value={{ tax: 2.5, ocoinPrice }}>
       <div className="">
         <Component {...pageProps} />
       </div>

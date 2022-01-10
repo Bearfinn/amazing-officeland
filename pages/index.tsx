@@ -18,9 +18,17 @@ const Home: NextPage = () => {
 
   const [includeFeeDuration, setIncludeFeeDuration] = useState(true);
   const [openedSlots, setOpenedSlots] = useState(10);
+  const [includeNewSlotPrice, setIncludeNewSlotPrice] = useState(true);
 
   const bonusSuccessRate = useMemo(() => {
+    if (openedSlots <= 10) return 0;
     return Math.floor((openedSlots - 10) / 2);
+  }, [openedSlots]);
+
+  const newSlotPrice = useMemo(() => {
+    if (openedSlots <= 10) return 0;
+    if (openedSlots >= 21) return 600;
+    return 250 + (openedSlots - 10) * 50;
   }, [openedSlots]);
 
   useEffect(() => {
@@ -89,7 +97,10 @@ const Home: NextPage = () => {
       coffee: CoffeeExtended
     ) => {
       const getPaybackPeriod = (ocoinPerHour: number, investPrice: number) => {
-        const investPriceInOcoin = investPrice / ocoinPrice;
+        let investPriceInOcoin = investPrice / ocoinPrice;
+        if (includeNewSlotPrice) {
+          investPriceInOcoin += newSlotPrice;
+        }
         let paybackPeriod = investPriceInOcoin / (ocoinPerHour * 24);
         if (includeFeeDuration) {
           paybackPeriod += 5; // days
@@ -143,7 +154,14 @@ const Home: NextPage = () => {
         paybackPeriod,
       };
     },
-    [getReward, includeFeeDuration, lowestPriceMapping, ocoinPrice]
+    [
+      getReward,
+      includeFeeDuration,
+      includeNewSlotPrice,
+      lowestPriceMapping,
+      newSlotPrice,
+      ocoinPrice,
+    ]
   );
 
   const rewardCalculations = useMemo(() => {
@@ -191,19 +209,12 @@ const Home: NextPage = () => {
           This calculation includes success rate, claim fee, withdraw fee,
           opened slots bonus, OCOIN price, etc.
         </div>
-        <div className="bg-gray-800 px-2 py-1">OCOIN Price: {ocoinPrice} WAX</div>
+        <div className="bg-gray-800 px-2 py-1">
+          OCOIN Price: {ocoinPrice} WAX
+        </div>
 
         <div className="mt-2 text-left leading-loose border rounded-lg px-4 py-2">
           <div className="font-bold text-center">Settings</div>
-          <div>
-            <input
-              className="mr-2 p-2"
-              type="checkbox"
-              checked={includeFeeDuration}
-              onChange={(e) => setIncludeFeeDuration(e.target.checked)}
-            ></input>
-            Include withdraw fee duration
-          </div>
           <div>
             <label>Opened slots</label>
             <input
@@ -214,7 +225,33 @@ const Home: NextPage = () => {
             ></input>
             (+1% success rate per 2 purchased slots)
           </div>
-          <div>Tax: {tax}% (withdraw at least 1,000 at one time)</div>
+          <div>
+            <input
+              className="mr-2 p-2"
+              type="checkbox"
+              checked={includeNewSlotPrice}
+              onChange={(e) => setIncludeNewSlotPrice(e.target.checked)}
+            ></input>
+            Include new slot price (Slot #{openedSlots + 1})
+          </div>
+          <div>
+            <input
+              className="mr-2 p-2"
+              type="checkbox"
+              checked={includeFeeDuration}
+              onChange={(e) => setIncludeFeeDuration(e.target.checked)}
+            ></input>
+            Include withdraw fee duration
+          </div>
+          <div>
+            <input
+              className="mr-2 p-2"
+              type="checkbox"
+              checked={includeFeeDuration}
+              onChange={(e) => setIncludeFeeDuration(e.target.checked)}
+            ></input>
+            Include withdraw tax ({tax}%, assuming withdraw more than 1,000 OCOIN at a time)
+          </div>
         </div>
       </div>
 

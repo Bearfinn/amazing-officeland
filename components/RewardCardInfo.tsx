@@ -21,7 +21,7 @@ const RewardCardInfo: FunctionComponent<RewardCardInfoProps> = ({
       <div className="relative p-2">
         <div className="flex items-center text-bold">
           <div className="">
-            {coffee.item_name !== "(No coffee)" && (
+            {/* {coffee.item_name !== "(No coffee)" && (
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={getCoffeeImageUrl(coffee.item_name.toLowerCase())}
@@ -29,7 +29,7 @@ const RewardCardInfo: FunctionComponent<RewardCardInfoProps> = ({
                 height="24"
                 alt="Coffee"
               ></img>
-            )}
+            )} */}
           </div>
           <div className="">{coffee.item_name}</div>
         </div>
