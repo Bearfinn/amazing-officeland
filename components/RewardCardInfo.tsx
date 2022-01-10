@@ -1,5 +1,6 @@
 import Image from "next/image";
-import { FunctionComponent } from "react";
+import { FunctionComponent, useContext } from "react";
+import { AppContext } from "../pages/_app";
 import { RewardCalculation } from "../types";
 import { formatNumber, getCoffeeImageUrl } from "../utils/format";
 
@@ -13,7 +14,8 @@ const RewardCardInfo: FunctionComponent<RewardCardInfoProps> = ({
   const { coffee, rewardInfo } = rewardCalculation;
   const { averageReward, averageRewardPerHour, workTime, paybackPeriod } =
     rewardInfo;
-  rewardCalculation;
+  const { ocoinPrice } = useContext(AppContext);
+
   return (
     <div className="flex text-sm" key={`coffee-${coffee.item_id}`}>
       <div className="relative p-2">
@@ -40,7 +42,9 @@ const RewardCardInfo: FunctionComponent<RewardCardInfoProps> = ({
             </div>
             <div className="text-[12px] text-gray-300">
               {formatNumber(averageReward)} OCOIN in {formatNumber(workTime)}h
-              <div></div>
+            </div>
+            <div className="text-[12px] text-gray-300">
+              {formatNumber(averageReward * ocoinPrice)} WAX/D
             </div>
             <div className="mt-4">
               <span className="text-gray-400 text-xs">PB </span>

@@ -6,7 +6,6 @@ import { CoffeeExtended, RewardCalculation, TaskList } from "../types";
 import { getLowestPriceOfRarity } from "../utils/atomic";
 import { formatNumber } from "../utils/format";
 import { getCoffees, getTaskList, RARITY_INFO } from "../utils/officeland";
-import { getOcoinPrice } from "../utils/wax";
 import { AppContext } from "./_app";
 
 const Home: NextPage = () => {
@@ -15,8 +14,7 @@ const Home: NextPage = () => {
   const [lowestPriceMapping, setLowestPriceMapping] = useState<
     Record<string, number>
   >({});
-  const [ocoinPrice, setOcoinPrice] = useState(0);
-  const { tax } = useContext(AppContext);
+  const { tax, ocoinPrice } = useContext(AppContext);
 
   const [includeFeeDuration, setIncludeFeeDuration] = useState(true);
   const [openedSlots, setOpenedSlots] = useState(10);
@@ -47,8 +45,6 @@ const Home: NextPage = () => {
         }))
       )
     );
-
-    getOcoinPrice().then((lastPrice) => setOcoinPrice(lastPrice));
 
     Object.keys(RARITY_INFO).forEach((rarity) => {
       getLowestPriceOfRarity(rarity).then((marketItem) => {
