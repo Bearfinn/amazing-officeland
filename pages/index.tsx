@@ -19,6 +19,11 @@ const Home: NextPage = () => {
   const { tax } = useContext(AppContext);
 
   const [includeFeeDuration, setIncludeFeeDuration] = useState(true);
+  const [openedSlots, setOpenedSlots] = useState(10);
+
+  const bonusSuccessRate = useMemo(() => {
+    return Math.floor((openedSlots - 10) / 2);
+  }, [openedSlots]);
 
   useEffect(() => {
     getTaskList().then((taskList) => setTaskList(taskList));
@@ -35,7 +40,8 @@ const Home: NextPage = () => {
         ].map((coffee) => ({
           ...coffee,
           average_success_rate:
-            (coffee.success_rate[0] + coffee.success_rate[1]) / 2,
+            (coffee.success_rate[0] + coffee.success_rate[1]) / 2 +
+            bonusSuccessRate,
           average_reduce_time:
             (coffee.reduce_time[0] + coffee.reduce_time[1]) / 2,
         }))
@@ -59,7 +65,7 @@ const Home: NextPage = () => {
         });
       });
     });
-  }, []);
+  }, [bonusSuccessRate]);
 
   const getReward = useCallback(
     (man_hours: number, difficulty: number, task_hours: number) => {
@@ -185,15 +191,32 @@ const Home: NextPage = () => {
             bananaminion
           </a>
         </div>
-        <div className="mt-2 border rounded-lg px-4 py-2">
-          <div>OCOIN Price: {ocoinPrice} WAX</div>
+        <div className="text-sm mt-2">
+          This calculation includes success rate, claim fee, withdraw fee,
+          opened slots bonus, OCOIN price, etc.
+        </div>
+        <div className="bg-gray-800 px-2 py-1">OCOIN Price: {ocoinPrice} WAX</div>
+
+        <div className="mt-2 text-left leading-loose border rounded-lg px-4 py-2">
+          <div className="font-bold text-center">Settings</div>
           <div>
             <input
+              className="mr-2 p-2"
               type="checkbox"
               checked={includeFeeDuration}
               onChange={(e) => setIncludeFeeDuration(e.target.checked)}
             ></input>
-            Include withdraw fee duration: No
+            Include withdraw fee duration
+          </div>
+          <div>
+            <label>Opened slots</label>
+            <input
+              className="bg-gray-700 px-2 py-1 rounded-lg mx-2 w-16 text-center"
+              type="text"
+              value={openedSlots}
+              onChange={(e) => setOpenedSlots(Number(e.target.value))}
+            ></input>
+            (+1% success rate per 2 purchased slots)
           </div>
           <div>Tax: {tax}% (withdraw at least 1,000 at one time)</div>
         </div>
