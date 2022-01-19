@@ -5,7 +5,7 @@ import RewardCard from "../components/RewardCard";
 import { CoffeeExtended, RewardCalculation, TaskList } from "../types";
 import { getLowestPriceOfRarity } from "../utils/atomic";
 import { formatNumber } from "../utils/format";
-import { getCoffees, getTaskList, RARITY_INFO } from "../utils/officeland";
+import { getCoffees, getTaskList, RARITY_INFO, TASK_COUNT_BEFORE_SLEEP } from "../utils/officeland";
 import { AppContext } from "./_app";
 
 const Home: NextPage = () => {
@@ -178,7 +178,7 @@ const Home: NextPage = () => {
     const result: RewardCalculation[] = [];
     taskList.forEach((task) => {
       Object.entries(RARITY_INFO).forEach(([rarity, rank]) => {
-        [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].forEach((sleep) => {
+        TASK_COUNT_BEFORE_SLEEP.forEach((sleep) => {
           coffees.forEach((coffee) => {
             const rewardInfo = calculateReward(
               task,
