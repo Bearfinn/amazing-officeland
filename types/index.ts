@@ -21,6 +21,8 @@ export interface Coffee {
 export interface RewardInfo {
   averageReward: number;
   averageRewardPerHour: number;
+  averageSuccessRate: number;
+  averageWorkTime: number;
   workTime: number;
   paybackPeriod: number;
 }
@@ -31,6 +33,7 @@ export interface RewardCalculation {
   rank: Record<string, any>;
   coffee: CoffeeExtended;
   rewardInfo: RewardInfo;
+  sleep: number;
 }
 
 export type CoffeeExtended = Coffee & {

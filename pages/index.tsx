@@ -94,7 +94,8 @@ const Home: NextPage = () => {
       task: Record<string, any>,
       rarity: string,
       rank: Record<string, any>,
-      coffee: CoffeeExtended
+      coffee: CoffeeExtended,
+      sleep: number
     ) => {
       const getPaybackPeriod = (ocoinPerHour: number, investPrice: number) => {
         let investPriceInOcoin = investPrice / ocoinPrice;
@@ -129,18 +130,25 @@ const Home: NextPage = () => {
       const workTime =
         ((100 - rank.reduce_time - coffee.average_reduce_time) / 100) *
         task.task_time;
+      const averageWorkTime = ((workTime * sleep) + 10) / sleep
+
+      const successRate = rank.success_rate + coffee.average_success_rate;
+      const averageSuccessRate =
+        (successRate + (successRate - 5 * (sleep - 1))) / 2;
+
+      console.log(`Sleep after working ${sleep} time: ${workTime}, ${averageWorkTime}, ${successRate}, ${averageSuccessRate}`)
 
       const averageReward = getAverageReward(
         rank.man_hours,
         task.task_diff,
-        rank.success_rate + coffee.average_success_rate,
+        averageSuccessRate,
         task.task_time,
         coffeeCost
       );
 
       const averageRewardPerHour = getAverageRewardPerHour(
         averageReward,
-        workTime
+        averageWorkTime
       );
 
       const paybackPeriod = getPaybackPeriod(
@@ -150,6 +158,8 @@ const Home: NextPage = () => {
       return {
         averageRewardPerHour,
         averageReward,
+        averageSuccessRate,
+        averageWorkTime,
         workTime,
         paybackPeriod,
       };
@@ -168,14 +178,23 @@ const Home: NextPage = () => {
     const result: RewardCalculation[] = [];
     taskList.forEach((task) => {
       Object.entries(RARITY_INFO).forEach(([rarity, rank]) => {
-        coffees.forEach((coffee) => {
-          const rewardInfo = calculateReward(task, rarity, rank, coffee);
-          result.push({
-            task,
-            rarity,
-            rank,
-            coffee,
-            rewardInfo,
+        [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].forEach((sleep) => {
+          coffees.forEach((coffee) => {
+            const rewardInfo = calculateReward(
+              task,
+              rarity,
+              rank,
+              coffee,
+              sleep
+            );
+            result.push({
+              task,
+              rarity,
+              rank,
+              coffee,
+              rewardInfo,
+              sleep,
+            });
           });
         });
       });
@@ -250,7 +269,8 @@ const Home: NextPage = () => {
               checked={includeFeeDuration}
               onChange={(e) => setIncludeFeeDuration(e.target.checked)}
             ></input>
-            Include withdraw tax ({tax}%, assuming withdraw more than 1,000 OCOIN at a time)
+            Include withdraw tax ({tax}%, assuming withdraw more than 1,000
+            OCOIN at a time)
           </div>
         </div>
       </div>
