@@ -15,7 +15,7 @@ const RewardCard: FunctionComponent<RewardCardProps> = ({
   return (
     <div className="relative group shadow-lg mt-8 rounded-lg bg-gray-800">
       <div
-        className={`uppercase px-4 py-2 rounded-t-lg text-gray-900 font-bold ${RARITY_INFO[rarity].bg_color}`}
+        className={`uppercase px-4 py-2 rounded-t-lg font-bold ${RARITY_INFO[rarity].bg_color}`}
       >
         {rarity}
       </div>
