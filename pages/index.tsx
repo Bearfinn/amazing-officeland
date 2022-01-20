@@ -281,8 +281,8 @@ const Home: NextPage = () => {
             <input
               className="mr-2 p-2"
               type="checkbox"
-              checked={includeFeeDuration}
-              onChange={(e) => setIncludeFeeDuration(e.target.checked)}
+              checked={true}
+              onChange={(e) => {}}
             ></input>
             Include withdraw tax ({tax}%, assuming withdraw more than 1,000
             OCOIN at a time)
