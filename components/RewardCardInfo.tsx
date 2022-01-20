@@ -17,6 +17,7 @@ const RewardCardInfo: FunctionComponent<RewardCardInfoProps> = ({
     averageRewardPerHour,
     averageSuccessRate,
     averageWorkTime,
+    reducedSuccessRate,
     workTime,
     paybackPeriod,
   } = rewardInfo;
@@ -49,7 +50,7 @@ const RewardCardInfo: FunctionComponent<RewardCardInfoProps> = ({
               <span className="text-sm ml-1">OCOIN/D</span>
             </div>
             <div className="text-[12px] text-gray-300">
-              {formatNumber(averageReward)} OCOIN in {formatNumber(workTime)}h
+              {formatNumber(averageReward)} OCOIN in {formatNumber(workTime)}h (SR -{formatNumber(reducedSuccessRate)}%)
             </div>
             <div className="text-[12px] text-gray-300">
               {formatNumber(averageRewardPerHour * 24 * ocoinPrice)} WAX/D

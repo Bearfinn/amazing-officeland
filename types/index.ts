@@ -23,6 +23,7 @@ export interface RewardInfo {
   averageRewardPerHour: number;
   averageSuccessRate: number;
   averageWorkTime: number;
+  reducedSuccessRate: number;
   workTime: number;
   paybackPeriod: number;
 }

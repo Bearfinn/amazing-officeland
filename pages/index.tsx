@@ -144,9 +144,10 @@ const Home: NextPage = () => {
       const averageWorkTime = (workTime * sleep + 10) / sleep;
 
       const successRate = rank.success_rate + coffee.average_success_rate;
+      const reducedSuccessRate = 0.25 * workTimeWithoutCoffee;
       const averageSuccessRate =
         (successRate +
-          (successRate - 0.25 * workTimeWithoutCoffee * (sleep - 1))) /
+          (successRate - reducedSuccessRate * (sleep - 1))) /
         2; // Average of maximum success rate and minimum success rate after working `sleep - 1` times
 
       console.log(
@@ -175,6 +176,7 @@ const Home: NextPage = () => {
         averageReward,
         averageSuccessRate,
         averageWorkTime,
+        reducedSuccessRate,
         workTime,
         paybackPeriod,
       };
