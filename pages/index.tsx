@@ -22,18 +22,18 @@ const Home: NextPage = () => {
   const { tax, ocoinPrice } = useContext(AppContext);
 
   const [includeFeeDuration, setIncludeFeeDuration] = useState(true);
-  const [openedSlots, setOpenedSlots] = useState(10);
+  const [openedSlots, setOpenedSlots] = useState(5);
   const [includeNewSlotPrice, setIncludeNewSlotPrice] = useState(true);
 
   const bonusSuccessRate = useMemo(() => {
-    if (openedSlots <= 10) return 0;
+    if (openedSlots <= 5) return 0;
     return Math.floor((openedSlots - 10) / 2);
   }, [openedSlots]);
 
   const newSlotPrice = useMemo(() => {
-    if (openedSlots <= 10) return 0;
+    if (openedSlots <= 5) return 0;
     if (openedSlots >= 21) return 600;
-    return 250 + (openedSlots - 10) * 50;
+    return (openedSlots - 5) * 50;
   }, [openedSlots]);
 
   useEffect(() => {
