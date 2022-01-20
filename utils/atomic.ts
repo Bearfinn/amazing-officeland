@@ -19,5 +19,5 @@ export const getLowestPriceOfRarity = async (rarity: string) => {
     `https://wax.api.atomicassets.io/atomicmarket/v1/sales/templates?${paramsString}`
   );
   const data = await res.json();
-  return data.data[0];
+  return data.data?.[0];
 };

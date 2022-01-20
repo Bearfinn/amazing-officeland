@@ -62,10 +62,14 @@ const Home: NextPage = () => {
     Object.keys(RARITY_INFO).forEach((rarity) => {
       getLowestPriceOfRarity(rarity).then((marketItem) => {
         // Get price with two precision digits
-        const price =
-          Number(
-            marketItem.price.amount.slice(0, marketItem.price.amount.length - 6)
-          ) / 100;
+        const price = marketItem
+          ? Number(
+              marketItem.price.amount.slice(
+                0,
+                marketItem.price.amount.length - 6
+              )
+            ) / 100
+          : 0;
         setLowestPriceMapping((prevState) => {
           return {
             ...prevState,
