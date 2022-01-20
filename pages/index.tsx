@@ -5,7 +5,12 @@ import RewardCard from "../components/RewardCard";
 import { CoffeeExtended, RewardCalculation, TaskList } from "../types";
 import { getLowestPriceOfRarity } from "../utils/atomic";
 import { formatNumber } from "../utils/format";
-import { getCoffees, getTaskList, RARITY_INFO, TASK_COUNT_BEFORE_SLEEP } from "../utils/officeland";
+import {
+  getCoffees,
+  getTaskList,
+  RARITY_INFO,
+  TASK_COUNT_BEFORE_SLEEP,
+} from "../utils/officeland";
 import { AppContext } from "./_app";
 
 const Home: NextPage = () => {
@@ -127,16 +132,22 @@ const Home: NextPage = () => {
 
       const coffeeCost = Number(coffee.item_amount.split(" ")[0]);
 
+      const workTimeWithoutCoffee =
+        (1 - rank.reduce_time / 100) * task.task_time;
       const workTime =
-        ((100 - rank.reduce_time - coffee.average_reduce_time) / 100) *
+        (1 - rank.reduce_time / 100 - coffee.average_reduce_time / 100) *
         task.task_time;
-      const averageWorkTime = ((workTime * sleep) + 10) / sleep
+      const averageWorkTime = (workTime * sleep + 10) / sleep;
 
       const successRate = rank.success_rate + coffee.average_success_rate;
       const averageSuccessRate =
-        (successRate + (successRate - 5 * (sleep - 1))) / 2;
+        (successRate +
+          (successRate - 0.25 * workTimeWithoutCoffee * (sleep - 1))) /
+        2; // Average of maximum success rate and minimum success rate after working `sleep - 1` times
 
-      console.log(`Sleep after working ${sleep} time: ${workTime}, ${averageWorkTime}, ${successRate}, ${averageSuccessRate}`)
+      console.log(
+        `Sleep after working ${sleep} time: ${workTime}, ${averageWorkTime}, ${successRate}, ${averageSuccessRate}`
+      );
 
       const averageReward = getAverageReward(
         rank.man_hours,
