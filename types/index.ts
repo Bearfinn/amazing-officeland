@@ -41,3 +41,35 @@ export type CoffeeExtended = Coffee & {
   average_reduce_time: number;
   average_success_rate: number;
 };
+
+export interface WorkingStaffInfo {
+  asset_ids: string[];
+  max_slot: number;
+  player: string;
+}
+
+export interface StaffInfo {
+  asset_id: string;
+  name: string;
+  template: {
+    template_id: string;
+  };
+  data: {
+    img: string;
+    name: string;
+    type: string;
+    rarity: string;
+    backimg: string;
+    description: string;
+  };
+}
+
+export interface AssignedTask {
+  asset_id: string;
+  item_used: number;
+  player: string;
+  task_end: number;
+  task_id: number;
+  task_start: IdleDeadline;
+  taskassign_id: number;
+}
