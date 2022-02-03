@@ -1,35 +1,44 @@
-import { useRouter } from "next/router";
-import { FunctionComponent, useEffect, useState } from "react";
-import { AssignedTask, StaffInfo, WorkingStaffInfo } from "../../types";
-import {
-  getAssignedTasks,
-  getOwnedStaffs,
-  getWorkingStaff,
-  RARITY_INFO,
-} from "../../utils/officeland";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
-import WorkingCard from "../../components/WorkingCard";
+import { FunctionComponent, useEffect, useState } from "react";
+import WorkingCard from "../components/WorkingCard";
+import { useReward } from "../hooks/useReward";
+import { AssignedTask, StaffInfo } from "../types";
+import {
+  getAssignedTasks,
+  getNFTByAssetIds,
+  getWorkingStaff
+} from "../utils/officeland";
+
 dayjs.extend(duration);
 
-interface WalletPageProps {}
+interface WalletCardProps {
+  address: string;
+}
 
-const WalletPage: FunctionComponent<WalletPageProps> = () => {
+const WalletCard: FunctionComponent<WalletCardProps> = ({ address }) => {
   const [ownedStaffs, setOwnedStaffs] = useState<StaffInfo[]>([]);
   const [employeeAssetIds, setEmployeeAssetIds] = useState<string[]>([]);
   const [assignedTasks, setAssignedTasks] = useState<AssignedTask[]>([]);
-  const { query } = useRouter();
-  const { address } = query;
 
   useEffect(() => {
-    if (address) {
-      getWorkingStaff(address as string).then((staff) =>
-        setEmployeeAssetIds(staff[0].asset_ids)
-      );
-      getOwnedStaffs(address as string).then((staff) => setOwnedStaffs(staff));
-      getAssignedTasks(address as string).then((tasks) =>
-        setAssignedTasks(tasks)
-      );
+    try {
+      if (address) {
+        let assetIds: string[] = [];
+        getWorkingStaff(address as string)
+          .then((staff) => {
+            assetIds = staff[0]?.asset_ids || [];
+            setEmployeeAssetIds(assetIds);
+          })
+          .then(() => {
+            getNFTByAssetIds(assetIds).then((staff) => setOwnedStaffs(staff));
+          });
+        getAssignedTasks(address as string).then((tasks) =>
+          setAssignedTasks(tasks)
+        );
+      }
+    } catch (error) {
+      console.error(error);
     }
   }, [address]);
 
@@ -37,9 +46,13 @@ const WalletPage: FunctionComponent<WalletPageProps> = () => {
     return ownedStaffs.find((staff) => staff.asset_id === asset_id);
   };
 
+  const { calculateReward } = useReward()
+
   return (
-    <div className="container mx-auto">
-      <div>{address}</div>
+    <div className="shadow-lg rounded-lg bg-stone-800 p-4">
+      <div className="my-4">
+        <div className="text-xl font-mono">{address}</div>
+      </div>
       <div className="flex flex-col gap-2">
         {employeeAssetIds.map((employeeAssetId) => {
           const employeeInfo = getStaffInfo(employeeAssetId);
@@ -49,9 +62,7 @@ const WalletPage: FunctionComponent<WalletPageProps> = () => {
           const taskEndTime = assignedTask
             ? dayjs(assignedTask.task_end * 1000)
             : null;
-          const remainingTime = taskEndTime
-            ? dayjs.duration(taskEndTime.diff(dayjs())).format("HH:mm:ss")
-            : null;
+
           return employeeInfo ? (
             <WorkingCard
               key={employeeAssetId}
@@ -67,4 +78,4 @@ const WalletPage: FunctionComponent<WalletPageProps> = () => {
   );
 };
 
-export default WalletPage;
+export default WalletCard;

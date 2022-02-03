@@ -81,7 +81,7 @@ export const getCoffees = async () => {
 export const getWorkingStaff = async (
   address: string
 ): Promise<WorkingStaffInfo[]> => {
-  return getOfficeLandData("publicspace", {
+  return getOfficeLandData("publicslots", {
     query: address,
     index_position: 1,
     key_type: "i64",
@@ -108,13 +108,47 @@ export const getOwnedStaffs = async (address: string): Promise<StaffInfo[]> => {
   return data.data.map((staff) => staff);
 };
 
+
+export const getNFTByAssetIds = async (
+  asset_ids: string[]
+): Promise<
+  {
+    asset_id: string;
+    name: string;
+    template: {
+      template_id: string;
+    };
+    data: {
+      img: string;
+      name: string;
+      type: string;
+      rarity: string;
+      backimg: string;
+      description: string;
+    };
+  }[]
+> => {
+  const params = {
+    ids: asset_ids.join(",")
+  };
+  const paramString = Object.entries(params)
+    .map(([key, value]) => `${key}=${value}`)
+    .join("&");
+  const response = await fetch(
+    `https://wax.api.atomicassets.io/atomicassets/v1/assets?${paramString}`
+  );
+  const data: { success: boolean; data: any[]; query_time: number } =
+    await response.json();
+  return data.data.map((staff) => staff);
+};
+
 export const getAssignedTasks = async (
   address: string
 ): Promise<AssignedTask[]> => {
-  const response = await getOfficeLandData("taskassign", {
+  const response = await getOfficeLandData("assigntasks", {
     query: address,
-    index_position: 3,
+    index_position: 1,
     key_type: "i64",
   });
-  return response;
+  return response[0]?.datas || [];
 };
