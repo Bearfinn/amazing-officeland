@@ -1,5 +1,6 @@
 import type { NextPage } from "next";
 import Head from "next/head";
+import Link from "next/link";
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import RewardCard from "../components/RewardCard";
 import { CoffeeExtended, RewardCalculation, TaskList } from "../types";
@@ -146,13 +147,7 @@ const Home: NextPage = () => {
       const successRate = rank.success_rate + coffee.average_success_rate;
       const reducedSuccessRate = 0.25 * workTimeWithoutCoffee;
       const averageSuccessRate =
-        (successRate +
-          (successRate - reducedSuccessRate * (sleep - 1))) /
-        2; // Average of maximum success rate and minimum success rate after working `sleep - 1` times
-
-      console.log(
-        `Sleep after working ${sleep} time: ${workTime}, ${averageWorkTime}, ${successRate}, ${averageSuccessRate}`
-      );
+        (successRate + (successRate - reducedSuccessRate * (sleep - 1))) / 2; // Average of maximum success rate and minimum success rate after working `sleep - 1` times
 
       const averageReward = getAverageReward(
         rank.man_hours,
@@ -228,6 +223,12 @@ const Home: NextPage = () => {
       <Head>
         <title>Officeland Boss Room</title>
       </Head>
+      <div className="bg-yellow-400 w-full text-black text-center">
+        Now you can see stats for your own wallet.{" "}
+        <Link href="/wallets" passHref>
+          <a className="underline">Click here</a>
+        </Link>
+      </div>
       <div className="text-center my-8">
         <div className="text-2xl">Officeland Boss Room</div>
         <div className="text-center">

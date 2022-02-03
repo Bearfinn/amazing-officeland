@@ -26,8 +26,6 @@ const WalletPage: FunctionComponent<WalletPageProps> = () => {
     })
   }
 
-  console.log(a, names)
-
   const accounts = a ? (a as string).split(",") : [];
 
   return (

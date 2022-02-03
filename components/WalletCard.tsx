@@ -46,8 +46,6 @@ const WalletCard: FunctionComponent<WalletCardProps> = ({ address }) => {
     return ownedStaffs.find((staff) => staff.asset_id === asset_id);
   };
 
-  const { calculateReward } = useReward()
-
   return (
     <div className="shadow-lg rounded-lg bg-stone-800 p-4">
       <div className="my-4">
